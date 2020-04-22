@@ -11,7 +11,7 @@ import traceback
 
 
 class Command(BaseCommand):
-    help = 'Imports data from legacy database into default database'
+    help = 'Imports data from legacy database into default database. SHOULD NOT BE USED AFTER TCF2.0 LAUNCH.'
 
     def migrate(
             self,
@@ -139,6 +139,16 @@ class Command(BaseCommand):
             subdepartment__mnemonic=review.course.subdepartment.mnemonic
         )
 
+        try:
+            # Try to fetch already created review
+            return Review.objects.get(
+                user=user,
+                course=course,
+                instructor=instructor,
+            )
+        except:
+            pass
+
         reading = review.amount_reading if review.amount_reading else 0
         writing = review.amount_writing if review.amount_writing else 0
         group = review.amount_group if review.amount_group else 0
@@ -220,7 +230,6 @@ class Command(BaseCommand):
                 text=vote.review.comment,
             )
         except Review.DoesNotExist:
-            print("TEST")
             review = self.migrate_review(vote.review)
         except Exception as e:
             print(e)
@@ -261,6 +270,6 @@ class Command(BaseCommand):
         UNKNOWN_DEPT, _ = Department.objects.get_or_create(
             name='UNKNOWN', school=UNKNOWN_SCHOOL)
 
-        self.migrate_reviews()
+        # self.migrate_reviews()
 
         self.migrate_votes()

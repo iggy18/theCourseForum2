@@ -404,12 +404,15 @@ class Review(models.Model):
     # After data migration, add the following in order to automatically
     # save created and modified dates.
 
-    # def save(self, *args, **kwargs):
-    #     ''' On save, update timestamps '''
-    #     if not self.id:
-    #         self.created = timezone.now()
-    #     self.modified = timezone.now()
-    #     return super(Review, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        '''On save, update timestamps and averages.'''
+
+        # Creating a new review.
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+
+        return super().save(*args, **kwargs)
 
     def average(self):
         """Average score for review."""
@@ -506,15 +509,73 @@ class Review(models.Model):
             models.Index(fields=['user', '-created']),
         ]
 
-        # Some of the tCF 1.0 data did not honor this constraint.
-        # Should we add it and remove duplicates from old data?
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'course', 'instructor'],
+                name='unique review per user, course, and instructor',
+            )
+        ]
 
-    #     constraints = [
-    #         models.UniqueConstraint(
-    #             fields=['user', 'course', 'instructor'],
-    #             name='unique review per user, course, and instructor',
-    #         )
-    #     ]
+
+class CourseAverage(models.Model):
+    course = models.OneToOneField(
+        Course,
+        on_delete=models.CASCADE,
+        primary_key=True)
+
+    instructor_rating_avg = models.PositiveSmallIntegerField(
+        choices=Review.RATINGS
+    )
+    difficulty_avg = models.PositiveSmallIntegerField(choices=Review.RATINGS)
+    recommendability_avg = models.PositiveSmallIntegerField(
+        choices=Review.RATINGS
+    )
+    hours_per_week_avg = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(168)])
+
+    def add_review(self, review):
+        pass
+
+    def modify_review(self, review):
+        pass
+    
+    @staticmethod
+    def get_or_create_for_course(course):
+        pass
+
+
+class InstructorAverage(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
+
+    instructor_rating_avg = models.PositiveSmallIntegerField(
+        choices=Review.RATINGS
+    )
+    difficulty_avg = models.PositiveSmallIntegerField(choices=Review.RATINGS)
+    recommendability_avg = models.PositiveSmallIntegerField(
+        choices=Review.RATINGS
+    )
+    hours_per_week_avg = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(168)])
+
+    def add_review(self, review):
+        pass
+
+    def modify_review(self, review):
+        pass
+
+    class Meta:
+
+        indexes = [
+            models.Index(fields=['course', 'instructor']),
+        ]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['course', 'instructor'],
+                name='unique average per course and instructor',
+            )
+        ]
 
 
 class Vote(models.Model):

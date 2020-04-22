@@ -8,7 +8,7 @@ import traceback
 
 
 class Command(BaseCommand):
-    help = 'Imports data from legacy database into default database'
+    help = 'Imports data from legacy database into default database. SHOULD NOT BE USED AFTER TCF2.0 LAUNCH.'
 
     def migrate(
             self,

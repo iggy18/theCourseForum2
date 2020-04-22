@@ -80,5 +80,18 @@
         - update courses with new course info if available
         - create new instructors if needed
 
-# TODO: Deploying to prod
+# TODO: Deploying to prod (assorted notes)
 - https://docs.djangoproject.com/en/3.0/howto/deployment/
+- docker exec -i tcf_db pg_restore -U tcf_django -f april18.pgsql
+```bash
+# 1- Dump schema.
+pg_dump -h server_source -U username -s -Fp -f schema.sql database
+# 2- Dump data only.
+pg_dump -h server_source -U username -a -Fc -f data.dmp database
+
+# 4- Restore schema in new host.
+psql -U username -d database -h server_destination -f modified_schema.sql
+
+# 5- Restore data disabling triggers
+pg_restore -h server_destination -U username -d database --disable-triggers -a data.dmp
+```

@@ -101,6 +101,41 @@ class AboutView(TemplateView):
                          "class": "2023",
                          "img_filename": "ENG_Jules_LeMenestrel.jpg",
                          "github": "julesfll"
+                         },
+                        {"name": "Jasmine Dogu",
+                         "role": "Developer",
+                         "class": "2022",
+                         "img_filename": "ENG_Jasmine_Dogu.jpg",
+                         "github": "ejd5mm"
+                         },
+                        {"name": "Vi Nguyen",
+                         "role": "Developer",
+                         "class": "2023",
+                         "img_filename": "ENG_Vi_Nguyen.jpg",
+                         "github": "vn6"
+                         },
+                        {"name": "Amrit Gorle",
+                         "role": "Developer",
+                         "class": "2023",
+                         "img_filename": "ENG_Amrit_Gorle.jpg",
+                         "github": "amritgorle"
+                         },
+                        {"name": "Mara Hart",
+                         "role": "Developer",
+                         "class": "2022",
+                         "img_filename": "ENG_Mara_Hart.jpg",
+                         "github": "maralihart"},
+                        {"name": "Arjun Kumar",
+                         "role": "Developer",
+                         "class": "2023",
+                         "img_filename": "ENG_Arjun_Kumar.jpg",
+                         "github": "arjunk01"
+                         },
+                        {"name": "Erick Tian",
+                         "role": "Developer",
+                         "class": "2023",
+                         "img_filename": "ENG_Erick_Tian.jpg",
+                         "github": "ericktian"
                          }
                         ]
 

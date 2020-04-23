@@ -131,6 +131,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 # python-social-auth settings.
 
@@ -168,26 +169,27 @@ SOCIAL_AUTH_PIPELINE = (
 if not DEBUG:
 
     # Heroku configuration.
-    import django_heroku
-    django_heroku.settings(locals())
+    # import django_heroku
+    # django_heroku.settings(locals())
 
     # Gather information from environment variables.
 
     HOSTNAME = os.environ.get('HOSTNAME', None)
     PUBLIC_IPV4 = os.environ.get('PUBLIC_IPV4', None)
 
-    ALLOWED_HOSTS = [
-        'tcf.brianyu.dev',
-        'thecourseforum.com',
-        'staging.thecourseforum.com',
-        'dev.thecourseforum.com',
-        'thecourseforum-staging.herokuapp.com',
-    ]
+    # SECURITY WARNING: App Engine's security features ensure that it is safe to
+    # have ALLOWED_HOSTS = ['*'] when the app is deployed. If you deploy a Django
+    # app not on App Engine, make sure to set an appropriate host here.
+    # See https://docs.djangoproject.com/en/1.10/ref/settings/ (from GCP documentation)
+    ALLOWED_HOSTS = ['*']
 
     if HOSTNAME:
         ALLOWED_HOSTS.append(HOSTNAME)
     if PUBLIC_IPV4:
         ALLOWED_HOSTS.append(PUBLIC_IPV4)
+
+    ES_COURSE_ENDPOINT = os.environ.get('ES_COURSE_ENDPOINT', None)
+    ES_API_KEY = os.environ.get('ES_API_KEY', None)
 
     DB_NAME = os.environ.get('DB_NAME', None)
     DB_HOST = os.environ.get('DB_HOST', None)

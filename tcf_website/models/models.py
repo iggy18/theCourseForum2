@@ -121,6 +121,8 @@ class User(AbstractUser):
         blank=True, null=True
     )
 
+    first_review_badge = models.BooleanField(default=False)
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
 
@@ -131,7 +133,6 @@ class User(AbstractUser):
     def reviews(self):
         """Return user reviews sorted by creation date."""
         return self.review_set.order_by("-created")
-
 
 class Instructor(models.Model):
     """Instructor model.

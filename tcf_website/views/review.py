@@ -39,7 +39,6 @@ def downvote(request, review_id):
 @login_required
 def new_review(request):
     """Review creation view."""
-
     # Collect form data into Review model instance.
     if request.method == 'POST':
         # TODO: use a proper django form.
@@ -74,6 +73,10 @@ def new_review(request):
                         request.POST['recommendability']),
                     hours_per_week=int(request.POST['hours']),
                 )
+                if not request.user.first_review_badge:
+                    request.user.first_review_badge = True
+                    request.user.save()
+
 
                 return redirect('reviews')
             except KeyError as err:

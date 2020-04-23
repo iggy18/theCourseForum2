@@ -73,10 +73,8 @@ def new_review(request):
                         request.POST['recommendability']),
                     hours_per_week=int(request.POST['hours']),
                 )
-                if not request.user.first_review_badge:
-                    request.user.first_review_badge = True
-                    request.user.save()
 
+                request.user.update_badges()
 
                 return redirect('reviews')
             except KeyError as err:

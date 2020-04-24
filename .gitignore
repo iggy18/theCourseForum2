@@ -10,4 +10,8 @@ legacy_db/*.sql
 tcf_website/migrations/*
 .env
 .vagrant/
+<<<<<<< HEAD
 postgres_data/
+static/
+predeploy.sh
+gae-service-account.json

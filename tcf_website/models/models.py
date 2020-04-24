@@ -135,7 +135,7 @@ class User(AbstractUser):
         return self.review_set.order_by("-created")
 
     def update_badges(self):
-        if not self.first_review_badge and self.review_set.count >= 1:
+        if not self.first_review_badge and self.review_set.count() >= 1:
             self.first_review_badge = True
         self.save()
 

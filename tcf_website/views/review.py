@@ -5,6 +5,7 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.contrib import messages
 
 from ..models import Review, Course, Semester, Instructor
 
@@ -74,7 +75,10 @@ def new_review(request):
                     hours_per_week=int(request.POST['hours']),
                 )
 
-                request.user.update_badges()
+                messages.success(request, 'Successfully added review!')
+                badge_message = request.user.update_badges()
+                if badge_message:
+                    messages.info(request, badge_message)
 
                 return redirect('reviews')
             except KeyError as err:

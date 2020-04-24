@@ -137,6 +137,7 @@ class User(AbstractUser):
     def update_badges(self):
         if not self.first_review_badge and self.review_set.count() >= 1:
             self.first_review_badge = True
+            return 'You earned the First Reviewer Badge!'
         self.save()
 
 

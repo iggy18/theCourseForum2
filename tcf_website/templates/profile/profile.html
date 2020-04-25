@@ -23,7 +23,14 @@
                     <i class="fas fa-graduation-cap fa-fw"></i> Class of {{ user.graduation_year }}
                 </p>
                 <p class="card-text">
-                    First Review Badge: {{ user.first_review_badge }}
+                    <hr>
+                    {% if user.new_reviewer_badge %}
+                    <i class="fas fa-trophy fa-2x" style="color:#212529" title="First Review Badge"></i>
+                    {% else %}
+                    <i class="fas fa-trophy fa-2x" style="color:#EBEBEB" title="First Review Badge"></i>
+                    {% endif %}
+                    <br>
+                    New Reviewer Badge
                 </p>
             </div>
         </div>

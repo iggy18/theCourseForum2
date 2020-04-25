@@ -121,7 +121,7 @@ class User(AbstractUser):
         blank=True, null=True
     )
 
-    first_review_badge = models.BooleanField(default=False)
+    new_reviewer_badge = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
@@ -135,10 +135,10 @@ class User(AbstractUser):
         return self.review_set.order_by("-created")
 
     def update_badges(self):
-        if not self.first_review_badge and self.review_set.count() >= 1:
-            self.first_review_badge = True
-            return 'You earned the First Reviewer Badge!'
-        self.save()
+        if not self.new_reviewer_badge and self.review_set.count() >= 1:
+            self.new_reviewer_badge = True
+            self.save()
+            return "You earned the New Reviewer Badge!"
 
 
 class Instructor(models.Model):

@@ -121,7 +121,21 @@ class User(AbstractUser):
         blank=True, null=True
     )
 
+    # badge for posting first review
     new_reviewer_badge = models.BooleanField(default=False)
+
+    # badge for posting 10 reviews
+    top_reviewer_badge = models.BooleanField(default=False)
+
+    # badge for having an account. Just to introduce the idea of badges
+    account_badge = models.BooleanField(default=True)
+
+    # badge for receiving first upvote
+    first_vote_badge = models.BooleanField(default=False)
+
+    # badge for receiving 10 upvotes
+    top_rated_badge = models.BooleanField(default=False)
+
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
@@ -135,10 +149,16 @@ class User(AbstractUser):
         return self.review_set.order_by("-created")
 
     def update_badges(self):
+        """Check for new badges earned and return a string that will be shown as a message"""
         if not self.new_reviewer_badge and self.review_set.count() >= 1:
             self.new_reviewer_badge = True
             self.save()
             return "You earned the New Reviewer Badge!"
+        
+        if not self.first_vote_badge and any([review.count_votes() >= 1 for review in self.reviews()]):
+            self.first_vote_badge = True
+            self.save()
+            return "You earned the First Vote Badge!"
 
 
 class Instructor(models.Model):

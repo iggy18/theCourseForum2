@@ -22,7 +22,13 @@ def upvote(request, review_id):
     """Upvote a view."""
     if request.method == 'POST':
         review = Review.objects.get(pk=review_id)
+
         review.upvote(request.user)
+        badge_message = request.user.update_badges()
+        if badge_message:
+            # Current problem: if two badges are earned at once, only one will show up
+            messages.info(request, badge_message)
+        
         return JsonResponse({'ok': True})
     return JsonResponse({'ok': False})
 
@@ -78,6 +84,7 @@ def new_review(request):
                 messages.success(request, 'Successfully added review!')
                 badge_message = request.user.update_badges()
                 if badge_message:
+                    # Current problem: if two badges are earned at once, only one will show up
                     messages.info(request, badge_message)
 
                 return redirect('reviews')

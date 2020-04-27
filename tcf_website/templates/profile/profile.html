@@ -22,16 +22,35 @@
                 <p class="card-text">
                     <i class="fas fa-graduation-cap fa-fw"></i> Class of {{ user.graduation_year }}
                 </p>
-                <p class="card-text">
-                    <hr>
-                    {% if user.new_reviewer_badge %}
-                    <i class="fas fa-trophy fa-2x" style="color:#212529" title="First Review Badge"></i>
-                    {% else %}
-                    <i class="fas fa-trophy fa-2x" style="color:#EBEBEB" title="First Review Badge"></i>
-                    {% endif %}
-                    <br>
-                    New Reviewer Badge
-                </p>
+                <hr>
+                <div class="card-deck">
+                    <div class="card">
+                        <div class="card-header">New Reviewer Badge</div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                {% if user.new_reviewer_badge %}
+                                <i class="fas fa-trophy fa-4x" style="color:#212529" title="First Review Badge"></i>
+                                {% else %}
+                                <i class="fas fa-trophy fa-4x" style="color:#EBEBEB" title="First Review Badge"></i>
+                                {% endif %}
+                                <br>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">First Vote Badge</div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                {% if user.first_vote_badge %}
+                                <i class="fas fa-chevron-up fa-4x" style="color:#212529" title="First Review Badge"></i>
+                                {% else %}
+                                <i class="fas fa-chevron-up fa-4x" style="color:#EBEBEB" title="First Review Badge"></i>
+                                {% endif %}
+                                <br>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

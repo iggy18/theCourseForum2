@@ -127,9 +127,6 @@ class User(AbstractUser):
     # badge for posting 10 reviews
     top_reviewer_badge = models.BooleanField(default=False)
 
-    # badge for having an account. Just to introduce the idea of badges
-    account_badge = models.BooleanField(default=True)
-
     # badge for receiving first upvote
     first_vote_badge = models.BooleanField(default=False)
 
@@ -149,7 +146,7 @@ class User(AbstractUser):
         return self.review_set.order_by("-created")
 
     def update_badges(self):
-        """Check for new badges earned and return a string that will be shown as a message"""
+        """Check for new badges earned and return a string that will be shown as a message."""
         if not self.new_reviewer_badge and self.review_set.count() >= 1:
             self.new_reviewer_badge = True
             self.save()
@@ -159,6 +156,12 @@ class User(AbstractUser):
             self.first_vote_badge = True
             self.save()
             return "You earned the First Vote Badge!"
+    
+    def get_badge_dict(self):
+        """Returns a dictionary of all badges and their values (includes 'badge' in the name)."""
+        all_fields = User.objects.filter(computing_id=self.computing_id).values()[0]
+        badge_fields = dict(filter(lambda elem: 'badge' in elem[0], all_fields.items()))
+        return badge_fields
 
 
 class Instructor(models.Model):

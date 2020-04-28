@@ -2,11 +2,17 @@
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 @login_required
 def profile(request):
     """User profile view."""
+    badge_message = request.user.update_badges()
+    if badge_message:
+         # Current problem: if two badges are earned at once, only one will show up
+        messages.info(request, badge_message)
+
     return render(request, 'profile/profile.html')
 
 

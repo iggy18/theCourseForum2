@@ -1,6 +1,7 @@
 """Views for index and about pages."""
 from django.shortcuts import render, redirect
 from django.views.generic.base import TemplateView
+from django.contrib import messages
 
 
 def index(request):
@@ -11,9 +12,11 @@ def index(request):
     browse page.
     """
     if request.user.is_authenticated:
-
-        # TODO: update badges here
-
+        
+        badge_message = request.user.update_badges()
+        if badge_message:
+            # Current problem: if two badges are earned at once, only one will show up
+            messages.info(request, badge_message)
 
         return redirect('browse')
     return render(request, 'landing/landing.html')

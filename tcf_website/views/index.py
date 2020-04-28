@@ -11,6 +11,10 @@ def index(request):
     browse page.
     """
     if request.user.is_authenticated:
+
+        # TODO: update badges here
+
+
         return redirect('browse')
     return render(request, 'landing/landing.html')
 

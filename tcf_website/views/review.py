@@ -24,6 +24,7 @@ def upvote(request, review_id):
         review = Review.objects.get(pk=review_id)
 
         review.upvote(request.user)
+        # Currently broken: comes from user logged in not user of review
         badge_message = request.user.update_badges()
         if badge_message:
             # Current problem: if two badges are earned at once, only one will show up
@@ -82,6 +83,7 @@ def new_review(request):
                 )
 
                 messages.success(request, 'Successfully added review!')
+
                 badge_message = request.user.update_badges()
                 if badge_message:
                     # Current problem: if two badges are earned at once, only one will show up

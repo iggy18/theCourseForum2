@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'social_django',
     'cachalot',  # TODO: add Redis?
-    'tcf_website'
+    'tcf_website',
 ]
 
 MIDDLEWARE = [

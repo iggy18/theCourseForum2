@@ -4,12 +4,12 @@
 {% block styles %}
 {% endblock %}
 
-{% block content %}
+{% block content %} 
 <div class="browse container-fluid d-flex flex-column align-items-center">
-    
+
     <div class="row">
     <div class="card col">
-        
+
     <form class="card-body text-center" action="{% url 'new_review' %}" method="POST">
         {% csrf_token %}
         <h2 class="card-title mt-3 mb-5">Write a review</h2>

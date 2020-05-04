@@ -4,14 +4,24 @@
 {% block login_content %}
 
 <h2 class="card-title">Welcome to theCourseForum!</h2>
-<form method="POST"> 
+<form method="POST">
     {% csrf_token %}
-    <div class="form-group">
+    <div class="form-group col">
         <div id="course-form-input" class="input-group">
             Please enter your graduation year: {{ form.grad_year }} <br>
-            <input type="submit" value="Submit"> 
         </div>
     </div>
-</form> 
+    <div class="form-group col">
+        <div id="course-form-input" class="input-group">
+            Please enter your major: {{ form.major }} <br>
+        </div>
+    </div>
+    <div class="form-group col">
+        <div id="course-form-input" class="input-group">
+            Please enter your second major: {{ form.second_major }}
+        </div>
+    </div>
+    <input type="submit" value="Submit">
+</form>
 
 {% endblock %}

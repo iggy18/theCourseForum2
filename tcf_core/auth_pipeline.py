@@ -58,6 +58,9 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     # Add graduation year and computing ID. This is extra info not
     # automatically collected by python-social-auth.
     fields['graduation_year'] = strategy.session_get('grad_year', None)
+    fields['major'] = strategy.session_get('major', None)
+    fields['second_major'] = strategy.session_get('second_major', None)
+
     fields['computing_id'] = kwargs.get(
         'email', details.get('email')).split('@')[0]
 

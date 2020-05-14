@@ -76,7 +76,6 @@ def new_review(request):
                     hours_per_week=int(request.POST['hours']),
                 )
 
-                messages.success(request, 'Successfully added review!')
 
                 return redirect('reviews')
             except KeyError as err:

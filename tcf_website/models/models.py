@@ -121,17 +121,18 @@ class User(AbstractUser):
         blank=True, null=True
     )
 
-    # badge for posting first review
-    new_reviewer_badge = models.BooleanField(default=False)
 
-    # badge for posting 10 reviews
-    top_reviewer_badge = models.BooleanField(default=False)
+    # # badge for posting first review
+    # new_reviewer_badge = models.BooleanField(default=False)
 
-    # badge for receiving first upvote
-    first_vote_badge = models.BooleanField(default=False)
+    # # badge for posting 10 reviews
+    # top_reviewer_badge = models.BooleanField(default=False)
 
-    # badge for receiving 10 upvotes
-    top_rated_badge = models.BooleanField(default=False)
+    # # badge for receiving first upvote
+    # first_vote_badge = models.BooleanField(default=False)
+
+    # # badge for receiving 10 upvotes
+    # top_rated_badge = models.BooleanField(default=False)
 
 
     def __str__(self):
@@ -147,22 +148,37 @@ class User(AbstractUser):
 
     def update_badges(self):
         """Check for new badges earned and return a string that will be shown as a message."""
-        if not self.new_reviewer_badge and self.review_set.count() >= 1:
-            self.new_reviewer_badge = True
-            self.save()
-            return "You earned the New Reviewer Badge!"
+        # if not self.new_reviewer_badge and self.review_set.count() >= 1:
+        #     self.new_reviewer_badge = True
+        #     self.save()
+        #     return "You earned the New Reviewer Badge!"
         
-        if not self.first_vote_badge and any([review.count_votes() >= 1 for review in self.reviews()]):
-            self.first_vote_badge = True
-            self.save()
-            return "You earned the First Vote Badge!"
+        # if not self.first_vote_badge and any([review.count_votes() >= 1 for review in self.reviews()]):
+        #     self.first_vote_badge = True
+        #     self.save()
+        #     return "You earned the First Vote Badge!"
+        if self.review_set.count() >= 1:
+            Badge.objects.create(
+                user=self,
+                name='New Reviewer Badge',
+            )
+            
     
-    def get_badge_dict(self):
-        """Returns a dictionary of all badges and their values (includes 'badge' in the name)."""
-        all_fields = User.objects.filter(computing_id=self.computing_id).values()[0]
-        badge_fields = dict(filter(lambda elem: 'badge' in elem[0], all_fields.items()))
-        return badge_fields
+    # def get_badge_dict(self):
+    #     """Returns a dictionary of all badges and their values (includes 'badge' in the name)."""
+    #     all_fields = User.objects.filter(computing_id=self.computing_id).values()[0]
+    #     badge_fields = dict(filter(lambda elem: 'badge' in elem[0], all_fields.items()))
+    #     return badge_fields
 
+class Badge(models.Model):
+    user = models.ForeignKey(User, related_name='badges', on_delete=models.CASCADE)
+    name = models.CharField(max_length=30)
+
+    def __str__(self):
+        """Return display name of badge."""
+        return self.name
+
+    # Could code in "badge choices"
 
 class Instructor(models.Model):
     """Instructor model.

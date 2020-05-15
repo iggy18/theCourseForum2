@@ -13,9 +13,6 @@ def index(request):
     if request.user.is_authenticated:
         
         badge_message = request.user.update_badges()
-        if badge_message:
-            # Current problem: if two badges are earned at once, only one will show up
-
         return redirect('browse')
     return render(request, 'landing/landing.html')
 

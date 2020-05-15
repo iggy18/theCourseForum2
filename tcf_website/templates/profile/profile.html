@@ -23,7 +23,10 @@
                     <i class="fas fa-graduation-cap fa-fw"></i> Class of {{ user.graduation_year }}
                 </p>
                 <hr>
-                <div class="row">
+                <div>
+                    {{user.badges.all}}
+                </div>
+                <!-- <div class="row">
                     {% for badge, value in user.get_badge_dict.items %}
                         <div class="col-lg-4 col-sm-12">
                             <div class="card-body">
@@ -38,7 +41,7 @@
                             <div class="card-header">{{ badge }}</div>
                         </div>
                     {% endfor %}
-                </div>
+                </div> -->
                 <!-- <div class="card-deck">
                     <div class="card">
                         <div class="card-body">

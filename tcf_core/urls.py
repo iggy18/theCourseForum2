@@ -20,4 +20,6 @@ urlpatterns = [
     path('', include('tcf_website.urls')),
     path('oauth/', include('social_django.urls')),
     path('admin/', admin.site.urls),
+    # for http reqs and db query inspections
+    path('silk/', include('silk.urls', namespace='silk')),
 ]

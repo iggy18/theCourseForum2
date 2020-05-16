@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def profile(request):
     """User profile view."""
-    badge_message = request.user.update_badges()
+    request.user.update_badges()
 
     return render(request, 'profile/profile.html')
 

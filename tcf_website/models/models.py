@@ -157,11 +157,18 @@ class User(AbstractUser):
         #     self.first_vote_badge = True
         #     self.save()
         #     return "You earned the First Vote Badge!"
-        if self.review_set.count() >= 1:
-            Badge.objects.create(
-                user=self,
-                name='New Reviewer Badge',
-            )
+        # if not self.badges.filter(name='New Reviewer Badge').exists() and self.review_set.count() >= 1:
+        #     Badge.objects.create(
+        #         user=self,
+        #         name='New Reviewer Badge',
+        #     )
+
+        # if not self.badges.filter(name='2 Reviews Badge').exists() and self.review_set.count() >= 2:
+        #     Badge.objects.create(
+        #         user=self,
+        #         name='2 Reviews Badge',
+        #     )
+
             
     
     # def get_badge_dict(self):
@@ -171,8 +178,13 @@ class User(AbstractUser):
     #     return badge_fields
 
 class Badge(models.Model):
+    """Badge model.
+
+    Belongs to a user.
+    """
     user = models.ForeignKey(User, related_name='badges', on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
+    icon = models.CharField(max_length=20)
 
     def __str__(self):
         """Return display name of badge."""

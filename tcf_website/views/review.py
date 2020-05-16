@@ -75,7 +75,6 @@ def new_review(request):
                         request.POST['recommendability']),
                     hours_per_week=int(request.POST['hours']),
                 )
-                request.user.update_badges()
 
                 return redirect('reviews')
             except KeyError as err:

@@ -23,25 +23,18 @@
                     <i class="fas fa-graduation-cap fa-fw"></i> Class of {{ user.graduation_year }}
                 </p>
                 <hr>
-                <div>
-                    {{user.badges.all}}
-                </div>
-                <!-- <div class="row">
-                    {% for badge, value in user.get_badge_dict.items %}
+                <div class="row">
+                    {% for badge in user.badges.all %}
                         <div class="col-lg-4 col-sm-12">
                             <div class="card-body">
                                 <p class="card-text">
-                                    {% if value %}
-                                    <i class="fas fa-trophy fa-4x" style="color:#212529"></i>
-                                    {% else %}
-                                    <i class="fas fa-trophy fa-4x" style="color:#d4d4d4"></i>
-                                    {% endif %}
+                                    
                                 </p>
                             </div>
-                            <div class="card-header">{{ badge }}</div>
+                            <div class="card-header">{{ badge.name }}</div>
                         </div>
                     {% endfor %}
-                </div> -->
+                </div>
                 <!-- <div class="card-deck">
                     <div class="card">
                         <div class="card-body">

@@ -405,15 +405,23 @@ class Review(models.Model):
     # Review modified date. Required.
     modified = models.DateTimeField(default=timezone.now)
 
-    # After data migration, add the following in order to automatically
-    # save created and modified dates.
+
 
     # def save(self, *args, **kwargs):
-    #     ''' On save, update timestamps '''
-    #     if not self.id:
-    #         self.created = timezone.now()
-    #     self.modified = timezone.now()
-    #     return super(Review, self).save(*args, **kwargs)
+    #     """On save, update average rating for course section."""
+        # course_reviewed = self.course
+        # # Change this aggregate function
+        # course_reviewed.average_rating = course_reviewed.review_set.aggregate(
+        #         rounded_avg_rating=Round(Avg('rating')))['rounded_avg_rating']
+        # course_reviewed.save()
+
+        # ''' On save, update timestamps '''
+        # After data migration, add the following in order to automatically
+        # save created and modified dates.
+        # if not self.id:
+        #     self.created = timezone.now()
+        # self.modified = timezone.now()
+        # return super(Review, self).save(*args, **kwargs)
 
     def average(self):
         """Average score for review."""
@@ -512,6 +520,7 @@ class Review(models.Model):
 
         # Some of the tCF 1.0 data did not honor this constraint.
         # Should we add it and remove duplicates from old data?
+        # - Sounds good, just keep the newer review - Jennifer
 
     #     constraints = [
     #         models.UniqueConstraint(
@@ -550,3 +559,59 @@ class Vote(models.Model):
                 name='unique vote per user and review',
             )
         ]
+
+
+class Average(models.Model):
+    """Average model.
+    Stores average review ratings of a Course taught by an Instructor
+    across all Semesters taught.
+
+    Has a Course.
+    Has an Instructor.
+    """
+
+    # Review course foreign key. Required.
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    # Review instructor foreign key. Required.
+    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
+    # Rating value. Required.
+    rating = models.DecimalField(max_digits=3, decimal_places=2,
+        validators=[MinValueValidator(0), MaxValueValidator(5)])
+    # Difficulty value. Required.
+    difficulty = models.DecimalField(max_digits=3, decimal_places=2,
+        validators=[MinValueValidator(0), MaxValueValidator(5)])
+    # Hours per week value. Required.
+    hours = models.DecimalField(max_digits=5, decimal_places=2,
+        validators=[MinValueValidator(0), MaxValueValidator(168)])
+
+    def __str__(self):
+        return f"Review average of {self.course} taught by {self.instructor}"
+
+
+    def find_average_rating(self):
+        """Compute average of instructor and recommend scores."""
+        ratings = Review.objects.filter(
+            course=course, instructor=instructor).aggregate(
+                models.Avg('recommendability'),
+                models.Avg('instructor_rating'))
+
+        recommendability = ratings.get('recommendability__avg')
+        instructor_rating = ratings.get('instructor_rating__avg')
+
+        # Return None if one component is absent.
+        if not recommendability or not instructor_rating:
+            return None
+
+        return (recommendability + instructor_rating) / 2
+
+    def find_average_difficulty(self):
+        """Compute average difficulty score."""
+        return Review.objects.filter(
+            course=course, instructor=instructor).aggregate(
+                models.Avg('difficulty'))['difficulty__avg']
+
+    def find_average_hours(self):
+        """Compute average hrs/wk."""
+        return Review.objects.filter(
+            course=course, instructor=instructor).aggregate(
+                models.Avg('hours_per_week'))['hours_per_week__avg']

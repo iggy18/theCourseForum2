@@ -11,7 +11,6 @@ from .models import *
 admin.site.register(User)
 admin.site.register(Review)
 admin.site.register(Vote)
-# admin.site.register(Average)
 
 
 class SchoolAdmin(admin.ModelAdmin):
@@ -56,6 +55,10 @@ class SectionAdmin(admin.ModelAdmin):
         qs = qs.prefetch_related('instructors')
         return qs
 
+class AverageAdmin(admin.ModelAdmin):
+    ordering = ['course']
+    list_display = ('course', 'instructor', 'rating', 'difficulty', 'hours')
+
 
 admin.site.register(Section, SectionAdmin)
 admin.site.register(Instructor, InstructorAdmin)
@@ -64,3 +67,4 @@ admin.site.register(School, SchoolAdmin)
 admin.site.register(Department, DepartmentAdmin)
 admin.site.register(Subdepartment, SubdepartmentAdmin)
 admin.site.register(Semester, SemesterAdmin)
+admin.site.register(Average, AverageAdmin)

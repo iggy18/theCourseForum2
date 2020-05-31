@@ -576,13 +576,16 @@ class Average(models.Model):
     instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE)
     # Rating value. Required.
     rating = models.DecimalField(max_digits=3, decimal_places=2,
-        validators=[MinValueValidator(0), MaxValueValidator(5)])
+        validators=[MinValueValidator(0), MaxValueValidator(5)],
+        null=True, blank=True)
     # Difficulty value. Required.
     difficulty = models.DecimalField(max_digits=3, decimal_places=2,
-        validators=[MinValueValidator(0), MaxValueValidator(5)])
+        validators=[MinValueValidator(0), MaxValueValidator(5)],
+        null=True, blank=True)
     # Hours per week value. Required.
     hours = models.DecimalField(max_digits=5, decimal_places=2,
-        validators=[MinValueValidator(0), MaxValueValidator(168)])
+        validators=[MinValueValidator(0), MaxValueValidator(168)],
+        null=True, blank=True)
 
     def __str__(self):
         return f"Review average of {self.course} taught by {self.instructor}"

@@ -18,7 +18,7 @@ class ReviewForm(forms.Form):
     coursenumberinput = forms.ChoiceField(choices=[(x, x) for x in Subdepartment.objects.all()])
     instructornameinput = forms.ChoiceField(choices=[(x, x) for x in Subdepartment.objects.all()])
     #subdepartment.recent_courses
-    semesterinput = forms.ChoiceField(choices=[("Fall","Fall"),("Winter","Winter"), ("Spring", "Spring"), ("Summer","Summer")])
+    semesterinput = forms.ChoiceField(choices=[("Fall","Fall"),("Winter","Winter"), ("Spring", "Spring"), ("Summer","Summer")]) 
     
     yearinput = forms.ChoiceField(choices=[(2020,2020),(2019,2019),(2018,2018),(2017,2017),(2016,2016),(2015,2015)])
     hoursinput = forms.IntegerField(min_value=0, max_value=40)

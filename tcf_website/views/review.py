@@ -1,4 +1,4 @@
-#pylint: disable=fixme
+# pylint: disable=fixme
 """View pertaining to review creation/viewing."""
 
 from django import forms
@@ -17,7 +17,7 @@ class ReviewForm(forms.Form):
     departmentinput = forms.ChoiceField(choices=[(x, x) for x in Subdepartment.objects.all()])
     coursenumberinput = forms.ChoiceField(choices=[(x, x) for x in Subdepartment.objects.all()])
     instructornameinput = forms.ChoiceField(choices=[(x, x) for x in Subdepartment.objects.all()])
-    #subdepartment.recent_courses
+    # subdepartment.recent_courses
 
     semesterinput = forms.ChoiceField(choices=[("Fall","Fall"),("Winter","Winter"), ("Spring", "Spring"), ("Summer","Summer")]) 
     yearinput = forms.ChoiceField(choices=[(2020,2020),(2019,2019),(2018,2018),(2017,2017),(2016,2016),(2015,2015)])
@@ -42,6 +42,7 @@ class ReviewForm(forms.Form):
     commentsinput.widget.attrs['class'] = "greyform comments-form p-1"
     commentsinput.widget.attrs['name'] = "reviewText"
     commentsinput.widget.attrs['id'] = "reviewText"
+
 
 
 @login_required

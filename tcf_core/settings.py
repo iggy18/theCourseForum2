@@ -36,6 +36,8 @@ ALLOWED_HOSTS = ['localhost', '.ngrok.io', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'dal', # For form autocomplete
+    'dal_select2', # For form autocomplete
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

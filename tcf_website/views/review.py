@@ -9,14 +9,21 @@ from django.shortcuts import render, redirect
 
 from ..models import Review, Course, Semester, Instructor
 
+from dal import autocomplete
+
+
+class InstructorAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        # if not self.request.user.is_authenticated:
+        #     return Instructor.objects.none()
+        qs = Instructor.objects.all()
+        return qs
+
 # TODO: use a proper django form, make it more robust.
 # (i.e. better Course/Instructor/Semester search).
-
-
-
-
-class ReviewForm(forms.Form):
+class ReviewForm(forms.Form): # Currently unused
     """Form for review creation."""
+    text = forms.CharField(widget=forms.Textarea)
 
 
 @login_required
@@ -98,8 +105,6 @@ def new_review(request):
                     str(course) + '!')
                 return redirect('reviews')
             except KeyError as err:
-                print(err)
-                print(request.POST)
                 messages.add_message(
                     request,
                     messages.ERROR,

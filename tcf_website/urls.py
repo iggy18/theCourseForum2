@@ -27,6 +27,7 @@ urlpatterns = [
         views.instructor_view,
         name='instructor'),
     path('reviews/new', views.new_review, name='new_review'),
+    path('instr-autocomp', views.InstructorAutocomplete.as_view(), name='instr-autocomp'),
     path('reviews', views.reviews, name='reviews'),
     path('reviews/<int:review_id>/upvote', views.upvote),
     path('reviews/<int:review_id>/downvote', views.downvote),

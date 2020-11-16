@@ -13,17 +13,25 @@
 
     <div class="card-body text-left">
 
+        {% if profile %}
+        <div class="d-flex">
+            <div>
+              <a class="review-header" href="{% url 'course_instructor' course_id=review.course.pk instructor_id=review.instructor.pk %}">
+                <p><strong>{{ review.course }}</strong> - {{ review.instructor.full_name }}</p>
+              </a>
+            </div>
+            <div class="ml-auto">
+              <!-- Edit functionality is TBD -->
+              <a class="review-edit btn btn-sm btn-primary" href="#">
+                <i class="fas fa-pencil-alt"></i> Edit
+              </a>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="d-flex flex-row align-items-center">
             <div>
-
-                {% if profile %}
-                <div class="d-flex justify-content-between">
-                    <a href="{% url 'course_instructor' course_id=review.course.pk instructor_id=review.instructor.pk %}"><p><strong>{{ review.instructor.full_name }} - {{ review.course }}</strong></p></a>
-                    <a href="#">Edit</a>
-                </div>
-                {% endif %}
                 <p style="white-space: pre-line;">{{ review.text }}</p>
-
             </div>
         </div>
 
@@ -37,24 +45,28 @@
                     </strong>
                 </div>
                 <div class="ml-4 text-muted">
-                    <i class="fas fa-comment"></i>
-                    {{ review.recommendability }}
-                </div>
-                <div class="ml-4 text-muted">
-                    <i class="fa fa-user fa-fw"></i>&nbsp;
+                    <i class="fas fa-user"></i>
                     {{ review.instructor_rating }}
                 </div>
                 <div class="ml-4 text-muted">
-                    <i class="far fa-grin"></i>
+                    <i class="far fa-smile-beam"></i>
                     {{ review.enjoyability }}
                 </div>
                 <div class="ml-4 text-muted">
+<<<<<<< Updated upstream
                     <i class="fa fa-dumbbell fa-fw"></i>&nbsp;
+=======
+                    <i class="fas fa-dumbbell"></i>
+>>>>>>> Stashed changes
                     {{ review.difficulty }}
                 </div>
                 <div class="ml-4 text-muted">
-                    <i class="fa fa-hourglass-half fa-fw"></i>&nbsp;
+                    <i class="fa fa-hourglass-half fa-fw"></i>
                     {{ review.hours_per_week }}
+                </div>
+                <div class="ml-4 text-muted">
+                    <i class="fas fa-thumbs-up"></i>
+                    {{ review.recommendability }}
                 </div>
             </div>
 

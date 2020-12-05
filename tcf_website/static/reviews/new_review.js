@@ -5,7 +5,7 @@
 */
 
 // Executed when DOM is ready
-jQuery(function($) {
+jQuery(function ($) {
     // Clear & disable sequenced dropdowns
     clearDropdown("#subject");
     clearDropdown("#course");
@@ -19,14 +19,14 @@ jQuery(function($) {
 
     // Fetch all subdepartment data from API
     var subdeptEndpoint = "/api/subdepartments/";
-    $.getJSON(subdeptEndpoint, function(data) {
+    $.getJSON(subdeptEndpoint, function (data) {
         // Sort departments alphabetically by mnemonic
-        data.sort(function(a, b) {
+        data.sort(function (a, b) {
             return a.mnemonic.localeCompare(b.mnemonic);
         });
 
         // Generate option tags
-        $.each(data, function(i, subdept) {
+        $.each(data, function (i, subdept) {
             $("<option />", {
                 val: subdept.id,
                 text: subdept.mnemonic + " | " + subdept.name
@@ -36,7 +36,7 @@ jQuery(function($) {
     });
 
     // Fetch course data on subject select
-    $("#subject").change(function() {
+    $("#subject").change(function () {
         // Clear & disable sequenced dropdowns
         clearDropdown("#course");
         clearDropdown("#instructor");
@@ -51,9 +51,9 @@ jQuery(function($) {
         var pageSize = "1000";
         var courseEndpoint = `/api/courses/?subdepartment=${subdeptID}
                               &page_size=${pageSize}&recent`;
-        $.getJSON(courseEndpoint, function(data) {
+        $.getJSON(courseEndpoint, function (data) {
             // Generate option tags
-            $.each(data.results, function(i, course) {
+            $.each(data.results, function (i, course) {
                 $("<option />", {
                     val: course.id,
                     text: course.number + " | " + course.title
@@ -64,7 +64,7 @@ jQuery(function($) {
     });
 
     // Fetch instructor data on course select
-    $("#course").change(function() {
+    $("#course").change(function () {
         // Clear & disable sequenced dropdowns
         clearDropdown("#instructor");
         clearDropdown("#semester");
@@ -77,11 +77,11 @@ jQuery(function($) {
         var pageSize = "1000";
         var instrEndpoint = `/api/instructors/?course=${course}` +
             `&page_size=${pageSize}`;
-        $.getJSON(instrEndpoint, function(data) {
+        $.getJSON(instrEndpoint, function (data) {
             clearDropdown("#instructor"); // Empty dropdown
 
             // Generate option tags
-            $.each(data.results, function(i, instr) {
+            $.each(data.results, function (i, instr) {
                 $("<option />", {
                     val: instr.id,
                     text: instr.first_name + " " + instr.last_name
@@ -92,7 +92,7 @@ jQuery(function($) {
     });
 
     // Fetch semester data on instructor select
-    $("#instructor").change(function() {
+    $("#instructor").change(function () {
         // Clear & disable sequenced dropdowns
         clearDropdown("#semester");
         // Enable semester selector, disable the following
@@ -102,9 +102,9 @@ jQuery(function($) {
         var course = $("#course").val();
         var instrID = $("#instructor").val();
         var semEndpoint = `/api/semesters/?course=${course}&instructor=${instrID}`;
-        $.getJSON(semEndpoint, function(data) {
+        $.getJSON(semEndpoint, function (data) {
             // Generate option tags
-            $.each(data, function(i, semester) {
+            $.each(data, function (i, semester) {
                 // Note: API returns semester list in reverse chronological order,
                 // Most recent 5 years only
                 $("<option />", {
@@ -119,39 +119,113 @@ jQuery(function($) {
     /* Course Rating Slider Inputs */
     // Instructor Rating
     $("#instructorRating2").val($("#instructorRating").val());
-    $("#instructorRating").change(function() {
+    $("#instructorRating").change(function () {
         $("#instructorRating2").val($("#instructorRating").val());
     });
-    $("#instructorRating2").change(function() {
+    $("#instructorRating2").change(function () {
         $("#instructorRating").val($("#instructorRating2").val());
     });
 
     // Enjoyability
     $("#enjoyability2").val($("#enjoyability").val());
-    $("#enjoyability").change(function() {
+    $("#enjoyability").change(function () {
         $("#enjoyability2").val($("#enjoyability").val());
     });
-    $("#enjoyability2").change(function() {
+    $("#enjoyability2").change(function () {
         $("#enjoyability").val($("#enjoyability2").val());
     });
 
     // Difficulty
     $("#difficulty2").val($("#difficulty").val());
-    $("#difficulty").change(function() {
+    $("#difficulty").change(function () {
         $("#difficulty2").val($("#difficulty").val());
     });
-    $("#difficulty2").change(function() {
+    $("#difficulty2").change(function () {
         $("#difficulty").val($("#difficulty2").val());
     });
 
     // Recommendability
     $("#recommendability2").val($("#recommendability").val());
-    $("#recommendability").change(function() {
+    $("#recommendability").change(function () {
         $("#recommendability2").val($("#recommendability").val());
     });
-    $("#recommendability2").change(function() {
+    $("#recommendability2").change(function () {
         $("#recommendability").val($("#recommendability2").val());
     });
+
+
+    var subj = "43"
+    var course = "748"
+    var ins = "691"
+    var sem = "40"
+    // setTimeout(() => {
+    //     console.log("World!");
+    //
+    //     setSemester(setInstructor(setCourse(setSubject())))
+    // }, 1);
+    //
+    // setDropdown("#subject", subj);
+    // setDropdown("#course", course);
+    // setDropdown("#instructor", ins);
+    // setDropdown("#semester", sem);
+
+    data = {
+        "subject": "43",
+        "course": "748",
+        "instructor": "691",
+        "sem": "40"
+    }
+
+    // console.log($("#subject").val())
+    // setSubject(setCourse(setInstructor(setSemester())))
+    setSemester(setInstructor(setCourse(setSubject())))
+
+    // console.log($("#subject").val())
+
+
+    function setSubject() {
+        setTimeout(() => {
+            console.log("setting subject", data.subject)
+            // $("#subject").val(data.subject).change()
+            setDropdown("#subject", subj)
+            console.log($("#subject").val())
+            if (typeof callback === 'function') {
+                callback(data)
+            }
+        }, 2000 / 2 / 2 / 3)
+
+    }
+
+    function setCourse(callback) {
+        setTimeout(() => {
+            console.log("setting course", data.course)
+            setDropdown("#course", course);
+            if (typeof callback === 'function') {
+                callback(data)
+            }
+        }, 4000 / 2 / 2 / 3)
+
+    }
+
+    function setInstructor(callback) {
+        setTimeout(() => {
+            console.log("setting ins", data.instructor)
+            setDropdown("#instructor", ins);
+            if (typeof callback === 'function') {
+                callback(data)
+            }
+        }, 6000 / 2 / 2 / 3)
+
+    }
+
+    function setSemester(callback) {
+        setTimeout(() => {
+            console.log("setting sem", data.semester)
+            setDropdown("#semester", sem);
+        }, 8000 / 2 / 2 / 3)
+
+    }
+
 });
 
 // Clears all dropdown options & adds a disabled default option
@@ -159,3 +233,15 @@ function clearDropdown(id) {
     $(id).empty();
     $(id).html("<option value='' disabled selected>Select...</option>");
 }
+
+// Sets to
+function setDropdown(id, choice) {
+    setTimeout(() => {
+        // console.log(id, choice)
+        $(id).val(choice) //.trigger('change');
+        $(id).change();
+    }, 0)
+    console.log($("#subject").val())
+}
+
+

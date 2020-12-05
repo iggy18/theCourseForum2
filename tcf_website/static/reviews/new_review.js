@@ -17,23 +17,7 @@ jQuery(function ($) {
     $("#instructor").prop("disabled", true);
     $("#semester").prop("disabled", true);
 
-    // Fetch all subdepartment data from API
-    var subdeptEndpoint = "/api/subdepartments/";
-    $.getJSON(subdeptEndpoint, function (data) {
-        // Sort departments alphabetically by mnemonic
-        data.sort(function (a, b) {
-            return a.mnemonic.localeCompare(b.mnemonic);
-        });
-
-        // Generate option tags
-        $.each(data, function (i, subdept) {
-            $("<option />", {
-                val: subdept.id,
-                text: subdept.mnemonic + " | " + subdept.name
-            }).appendTo("#subject");
-        });
-        return this;
-    });
+    fillSubjects($);
 
     // Fetch course data on subject select
     $("#subject").change(function () {
@@ -46,21 +30,7 @@ jQuery(function ($) {
         $("#instructor").prop("disabled", true);
         $("#semester").prop("disabled", true);
 
-        // Fetch course data from API, based on selected subdepartment
-        var subdeptID = $("#subject").val();
-        var pageSize = "1000";
-        var courseEndpoint = `/api/courses/?subdepartment=${subdeptID}
-                              &page_size=${pageSize}&recent`;
-        $.getJSON(courseEndpoint, function (data) {
-            // Generate option tags
-            $.each(data.results, function (i, course) {
-                $("<option />", {
-                    val: course.id,
-                    text: course.number + " | " + course.title
-                }).appendTo("#course");
-            });
-            return this;
-        });
+        fillCourses($);
     });
 
     // Fetch instructor data on course select
@@ -72,23 +42,7 @@ jQuery(function ($) {
         $("#instructor").prop("disabled", false);
         $("#semester").prop("disabled", true);
 
-        // Fetch instructor data from API, based on selected course
-        var course = $("#course").val();
-        var pageSize = "1000";
-        var instrEndpoint = `/api/instructors/?course=${course}` +
-            `&page_size=${pageSize}`;
-        $.getJSON(instrEndpoint, function (data) {
-            clearDropdown("#instructor"); // Empty dropdown
-
-            // Generate option tags
-            $.each(data.results, function (i, instr) {
-                $("<option />", {
-                    val: instr.id,
-                    text: instr.first_name + " " + instr.last_name
-                }).appendTo("#instructor");
-            });
-            return this;
-        });
+        fillInstructors($);
     });
 
     // Fetch semester data on instructor select
@@ -98,22 +52,7 @@ jQuery(function ($) {
         // Enable semester selector, disable the following
         $("#semester").prop("disabled", false);
 
-        // Fetch all semester data from API
-        var course = $("#course").val();
-        var instrID = $("#instructor").val();
-        var semEndpoint = `/api/semesters/?course=${course}&instructor=${instrID}`;
-        $.getJSON(semEndpoint, function (data) {
-            // Generate option tags
-            $.each(data, function (i, semester) {
-                // Note: API returns semester list in reverse chronological order,
-                // Most recent 5 years only
-                $("<option />", {
-                    val: semester.id,
-                    text: semester.season + " " + semester.year
-                }).appendTo("#semester");
-            });
-            return this;
-        });
+        fillSemesters($);
     });
 
     /* Course Rating Slider Inputs */
@@ -193,7 +132,6 @@ jQuery(function ($) {
                 callback(data)
             }
         }, 2000 / 2 / 2 / 3)
-
     }
 
     function setCourse(callback) {
@@ -204,7 +142,6 @@ jQuery(function ($) {
                 callback(data)
             }
         }, 4000 / 2 / 2 / 3)
-
     }
 
     function setInstructor(callback) {
@@ -223,7 +160,6 @@ jQuery(function ($) {
             console.log("setting sem", data.semester)
             setDropdown("#semester", sem);
         }, 8000 / 2 / 2 / 3)
-
     }
 
 });
@@ -244,4 +180,84 @@ function setDropdown(id, choice) {
     console.log($("#subject").val())
 }
 
+function setFixedDropdown(id, choice) {
+    $(id).empty();
+    $(id).html("<option value=`${choice.id}` disabled selected>Select...</option>");
+}
 
+function fillSubjects($) {
+    // Fetch all subdepartment data from API
+    var subdeptEndpoint = "/api/subdepartments/";
+    $.getJSON(subdeptEndpoint, function (data) {
+        // Sort departments alphabetically by mnemonic
+        data.sort(function (a, b) {
+            return a.mnemonic.localeCompare(b.mnemonic);
+        });
+
+        // Generate option tags
+        $.each(data, function (i, subdept) {
+            $("<option />", {
+                val: subdept.id,
+                text: subdept.mnemonic + " | " + subdept.name
+            }).appendTo("#subject");
+        });
+        return this;
+    });
+}
+
+function fillCourses($) {
+    // Fetch course data from API, based on selected subdepartment
+    var subdeptID = $("#subject").val();
+    var pageSize = "1000";
+    var courseEndpoint = `/api/courses/?subdepartment=${subdeptID}
+                              &page_size=${pageSize}&recent`;
+    $.getJSON(courseEndpoint, function (data) {
+        // Generate option tags
+        $.each(data.results, function (i, course) {
+            $("<option />", {
+                val: course.id,
+                text: course.number + " | " + course.title
+            }).appendTo("#course");
+        });
+        return this;
+    });
+}
+
+function fillInstructors($) {
+    // Fetch instructor data from API, based on selected course
+    var course = $("#course").val();
+    var pageSize = "1000";
+    var instrEndpoint = `/api/instructors/?course=${course}` +
+        `&page_size=${pageSize}`;
+    $.getJSON(instrEndpoint, function (data) {
+        clearDropdown("#instructor"); // Empty dropdown
+
+        // Generate option tags
+        $.each(data.results, function (i, instr) {
+            $("<option />", {
+                val: instr.id,
+                text: instr.first_name + " " + instr.last_name
+            }).appendTo("#instructor");
+        });
+        return this;
+    });
+}
+
+function fillSemesters($) {
+    // Fetch all semester data from API
+    var course = $("#course").val();
+    var instrID = $("#instructor").val();
+    var semEndpoint = `/api/semesters/?course=${course}&instructor=${instrID}`;
+    $.getJSON(semEndpoint, function (data) {
+        // Generate option tags
+        $.each(data, function (i, semester) {
+            // Note: API returns semester list in reverse chronological order,
+            // Most recent 5 years only
+            $("<option />", {
+                val: semester.id,
+                text: semester.season + " " + semester.year
+            }).appendTo("#semester");
+        });
+        return this;
+    });
+}

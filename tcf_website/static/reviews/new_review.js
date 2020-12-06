@@ -228,16 +228,16 @@ jQuery(function ($) {
 
     // console.log($("#subject").val())
     // setSubject(setCourse(setInstructor(setSemester())))
-    // setSemester(setInstructor(setCourse(setSubject())))
+    setInstructor(setCourse(setSubject()))
 
     // console.log($("#subject").val())
 
 
     function setSubject() {
         setTimeout(() => {
-            console.log("setting subject", data.subject)
+            console.log("setting subject", preload_data.subject)
             // $("#subject").val(data.subject).change()
-            setDropdown("#subject", subj)
+            setDropdown("#subject", preload_data.subject)
             console.log($("#subject").val())
             if (typeof callback === 'function') {
                 callback(data)
@@ -247,8 +247,8 @@ jQuery(function ($) {
 
     function setCourse(callback) {
         setTimeout(() => {
-            console.log("setting course", data.course)
-            setDropdown("#course", course);
+            console.log("setting course", preload_data.course)
+            setDropdown("#course", preload_data.course);
             if (typeof callback === 'function') {
                 callback(data)
             }
@@ -257,20 +257,13 @@ jQuery(function ($) {
 
     function setInstructor(callback) {
         setTimeout(() => {
-            console.log("setting ins", data.instructor)
-            setDropdown("#instructor", ins);
+            console.log("setting ins", preload_data.instructor)
+            setDropdown("#instructor", preload_data.instructor);
             if (typeof callback === 'function') {
                 callback(data)
             }
         }, 6000 / 2 / 2 / 3)
 
-    }
-
-    function setSemester(callback) {
-        setTimeout(() => {
-            console.log("setting sem", data.semester)
-            setDropdown("#semester", sem);
-        }, 8000 / 2 / 2 / 3)
     }
 
 });

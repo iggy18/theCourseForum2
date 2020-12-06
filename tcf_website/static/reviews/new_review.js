@@ -6,6 +6,7 @@
 
 // Executed when DOM is ready
 jQuery(function ($) {
+    console.log(preload_data)
     // Clear & disable sequenced dropdowns
     clearDropdown("#subject");
     clearDropdown("#course");
@@ -35,6 +36,40 @@ jQuery(function ($) {
         return this;
     });
 
+    let trigger_preload = false
+    if (!jQuery.isEmptyObject(preload_data)){
+        console.log("preloading", preload_data)
+        trigger_preload = true
+    }
+
+
+
+    // var subj = "43"
+    // var course = "748"
+    // var ins = "691"
+
+
+
+    // if (true) {
+    //     // $("#subject").val(subj)
+    //     // $("#subject").change();
+    //
+    //     $("#subject").change(function () {
+    //         $("#course").val(course).trigger('change')
+    //     })
+    //
+    //     $("#course").change(function () {
+    //         $("#instructor").val(ins).trigger('change')
+    //     })
+    //
+    //     $("#instructor").change(function () {
+    //         $("#semester").val(sem).trigger('change')
+    //     })
+    //
+    //     $("#subject").val(subj).trigger('change')
+    // }
+
+
     // Fetch course data on subject select
     $("#subject").change(function () {
         // Clear & disable sequenced dropdowns
@@ -61,6 +96,11 @@ jQuery(function ($) {
             });
             return this;
         });
+
+        if (trigger_preload) {
+            console.log(preload_data.course)
+            $("#course").val(preload_data.course).trigger('change')
+        }
     });
 
     // Fetch instructor data on course select
@@ -89,6 +129,10 @@ jQuery(function ($) {
             });
             return this;
         });
+        if (trigger_preload) {
+            $("#instructor").val(preload_data.instructor).trigger('change')
+            trigger_preload = false
+        }
     });
 
     // Fetch semester data on instructor select
@@ -115,6 +159,16 @@ jQuery(function ($) {
             return this;
         });
     });
+
+    setTimeout(() => {
+            if (trigger_preload){
+        console.log("cascading")
+        $("#subject").val(preload_data.subject).trigger('change')
+    }
+    }, 1000)
+
+
+
 
     /* Course Rating Slider Inputs */
     // Instructor Rating
@@ -154,10 +208,6 @@ jQuery(function ($) {
     });
 
 
-    var subj = "43"
-    var course = "748"
-    var ins = "691"
-    var sem = "40"
     // setTimeout(() => {
     //     console.log("World!");
     //
@@ -169,16 +219,16 @@ jQuery(function ($) {
     // setDropdown("#instructor", ins);
     // setDropdown("#semester", sem);
 
-    data = {
-        "subject": "43",
-        "course": "748",
-        "instructor": "691",
-        "sem": "40"
-    }
+    // data = {
+    //     "subject": "43",
+    //     "course": "748",
+    //     "instructor": "691",
+    //     "sem": "40"
+    // }
 
     // console.log($("#subject").val())
     // setSubject(setCourse(setInstructor(setSemester())))
-    setSemester(setInstructor(setCourse(setSubject())))
+    // setSemester(setInstructor(setCourse(setSubject())))
 
     // console.log($("#subject").val())
 

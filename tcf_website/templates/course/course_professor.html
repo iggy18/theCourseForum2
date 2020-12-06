@@ -165,9 +165,16 @@
 
         <div class="card col-12 col-sm-8 col-lg-4 text-center">
             <div class="card-body">
-                <a href="{% url 'new_review' %}?test=test"><button class="btn btn-primary">
-                    Write a Review!
-                </button></a>
+                    <form id="autofill" action="{% url 'new_review' %}" method="POST">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="preload_subject" value="{{ course.subdepartment_id }}">
+                        <input type="hidden" name="preload_course" value="{{ course_id }}">
+                        <input type="hidden" name="preload_instructor" value="{{ instructor.id }}">
+                        <button type="submit" class="btn btn-primary">
+                            Write a Review!
+                        </button>
+                    </form>
 
                 <div class="dropdown">
                     <button id="review-sort-select" class="btn btn-secondary dropdown-toggle" type="button"
@@ -213,4 +220,12 @@
 
         loadData(JSON.parse("{{ data|escapejs }}"))
     </script>
+{#    <script type="module">#}
+{#        import {postData} from "{% static 'course/javascript/autofill_review.js' %}"#}
+{#        $('#autofill').on('submit', function(e) {#}
+{#            e.preventDefault()#}
+{#            postData("{% url 'new_review' %}", {{ course.subdepartment.id}}, {{course.id}}, {{instructor.id}},"{{ csrf_token }}")#}
+{#        })#}
+{##}
+{#    </script>#}
 {% endblock %}

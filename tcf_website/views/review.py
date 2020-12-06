@@ -1,4 +1,5 @@
 """View pertaining to review creation/viewing."""
+import json
 
 from django import forms
 from django.views import generic
@@ -11,6 +12,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 
 from ..models import Review, Course, Semester, Instructor
+
 
 # pylint: disable=fixme
 # Disable pylint errors on TODO messages, such as below
@@ -49,6 +51,16 @@ def new_review(request):
 
     # Collect form data into Review model instance.
     if request.method == 'POST':
+        # only need to test if one of the preload fields exists as
+        # one can be present if and only if the others are also there
+        preload_data = {}
+        if request.POST['preload_subject']:
+            preload_data = {
+                # the review form has values as strings so need to convert
+                'subject': str(request.POST['preload_subject']),
+                'course': str(request.POST['preload_course']),
+                'instructor': str(request.POST['preload_instructor'])
+            }
         # TODO: use a proper django form.
         form = ReviewForm(request.POST)
         if form.is_valid():
@@ -101,9 +113,10 @@ def new_review(request):
                     'This course is invalid. Try again!')
                 return render(request,
                               'reviews/new_review.html',
-                              {'form': form})
+                              {'form': form, 'preload_data': json.dumps(preload_data)})
         else:
-            return render(request, 'reviews/new_review.html', {'form': form})
+            return render(request, 'reviews/new_review.html',
+                          {'form': form, 'preload_data': preload_data})
 
     form = ReviewForm()
     return render(request, 'reviews/new_review.html', {'form': form})

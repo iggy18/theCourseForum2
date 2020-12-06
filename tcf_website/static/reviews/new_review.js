@@ -92,21 +92,14 @@ jQuery(function ($) {
         $("#recommendability").val($("#recommendability2").val());
     });
 
-
-    var subj = "43"
-    var course = "748"
-    var ins = "691"
-    var sem = "40"
+    console.log("hi!")
     // setTimeout(() => {
     //     console.log("World!");
     //
     //     setSemester(setInstructor(setCourse(setSubject())))
     // }, 1);
     //
-    // setDropdown("#subject", subj);
-    // setDropdown("#course", course);
-    // setDropdown("#instructor", ins);
-    // setDropdown("#semester", sem);
+
 
     data = {
         "subject": "43",
@@ -117,10 +110,11 @@ jQuery(function ($) {
 
     // console.log($("#subject").val())
     // setSubject(setCourse(setInstructor(setSemester())))
-    setSemester(setInstructor(setCourse(setSubject())))
+    // setSemester(setInstructor(setCourse(setSubject())))
 
     // console.log($("#subject").val())
 
+    console.log("hi!!!")
 
     function setSubject() {
         setTimeout(() => {
@@ -162,7 +156,72 @@ jQuery(function ($) {
         }, 8000 / 2 / 2 / 3)
     }
 
+    // choice = {
+    //     'val': '43',
+    //     'text': 'ECON | Economics'
+    // }
+    // setFixedDropdown("#subject", choice)
+    // // fillSubjects($)
+    // // fillCourses($)
+    // choice2 = {
+    //     'val': '750',
+    //     'text': '2060 | American Economic History'
+    // }
+    // setFixedDropdown("#course", choice2)
+    // fillInstructors($)
+    // fillInstructors($)
+
+    // new Promise((resolve, reject) => {
+    //     setDropdown("#subject", subj);
+    //     fillCourses()
+    //     resolve()
+    // }).then(() => {
+    //     console.log("stafsdsf")
+    //     setDropdown("#course", course);
+    //     fillInstructors()
+    // }).then(() => {
+    //     setDropdown("#instructor", ins);
+    //     fillSemesters()
+    // }).then(() => {
+    //     setDropdown("#semester", sem);
+    // })
+
+    // new Promise((resolve, reject) => {
+    //     console.log('Initial');
+    //
+    //     resolve();
+    // })
+    //     .then(() => {
+    //         throw new Error('Something failed');
+    //
+    //         console.log('Do this');
+    //     })
+    //     .catch(() => {
+    //         console.error('Do that');
+    //     })
+    //     .then(() => {
+    //         console.log('Do this, no matter what happened before');
+    //     });
+    autofill()
 });
+
+async function autofill() {
+    console.log("hi!")
+    var subj = "43"
+    var course = "748"
+    var ins = "691"
+    var sem = "40"
+
+    await fillSubjects($)
+    await setDropdown("#subject", subj);
+    await fillCourses($)
+    console.log("should happen after")
+    await setDropdown("#course", course);
+    await fillInstructors($)
+    await setDropdown("#instructor", ins);
+    await fillSemesters($)
+    await setDropdown("#semester", sem);
+}
 
 // Clears all dropdown options & adds a disabled default option
 function clearDropdown(id) {
@@ -172,92 +231,112 @@ function clearDropdown(id) {
 
 // Sets to
 function setDropdown(id, choice) {
-    setTimeout(() => {
-        // console.log(id, choice)
-        $(id).val(choice) //.trigger('change');
-        $(id).change();
-    }, 0)
-    console.log($("#subject").val())
+    return new Promise(resolve => {
+        console.log(id, choice)
+        $(id).val(choice).trigger('change');
+        // $(id).change();
+
+        console.log(id, "set to", $(id).val())
+        resolve("set")
+    })
 }
 
 function setFixedDropdown(id, choice) {
+    console.log(id, choice, choice.val)
+
     $(id).empty();
-    $(id).html("<option value=`${choice.id}` disabled selected>Select...</option>");
+    $(id).html(`<option value=${choice.val}>${choice.text}</option>`);
+
+    console.log($(id).val())
 }
 
 function fillSubjects($) {
-    // Fetch all subdepartment data from API
-    var subdeptEndpoint = "/api/subdepartments/";
-    $.getJSON(subdeptEndpoint, function (data) {
-        // Sort departments alphabetically by mnemonic
-        data.sort(function (a, b) {
-            return a.mnemonic.localeCompare(b.mnemonic);
-        });
+    return new Promise(resolve => {
+        // Fetch all subdepartment data from API
+        var subdeptEndpoint = "/api/subdepartments/";
+        $.getJSON(subdeptEndpoint, function (data) {
+            // Sort departments alphabetically by mnemonic
+            data.sort(function (a, b) {
+                return a.mnemonic.localeCompare(b.mnemonic);
+            });
 
-        // Generate option tags
-        $.each(data, function (i, subdept) {
-            $("<option />", {
-                val: subdept.id,
-                text: subdept.mnemonic + " | " + subdept.name
-            }).appendTo("#subject");
+            // Generate option tags
+            $.each(data, function (i, subdept) {
+                $("<option />", {
+                    val: subdept.id,
+                    text: subdept.mnemonic + " | " + subdept.name
+                }).appendTo("#subject");
+            });
+            return this;
         });
-        return this;
-    });
+        resolve("subjects filled")
+    })
 }
 
 function fillCourses($) {
-    // Fetch course data from API, based on selected subdepartment
-    var subdeptID = $("#subject").val();
-    var pageSize = "1000";
-    var courseEndpoint = `/api/courses/?subdepartment=${subdeptID}
+    return new Promise(resolve => {
+        // Fetch course data from API, based on selected subdepartment
+        var subdeptID = $("#subject").val();
+        console.log("subdept is",subdeptID)
+        var pageSize = "1000";
+        var courseEndpoint = `/api/courses/?subdepartment=${subdeptID}
                               &page_size=${pageSize}&recent`;
-    $.getJSON(courseEndpoint, function (data) {
-        // Generate option tags
-        $.each(data.results, function (i, course) {
-            $("<option />", {
-                val: course.id,
-                text: course.number + " | " + course.title
-            }).appendTo("#course");
+        $.getJSON(courseEndpoint, function (data) {
+            // Generate option tags
+            $.each(data.results, function (i, course) {
+                $("<option />", {
+                    val: course.id,
+                    text: course.number + " | " + course.title
+                }).appendTo("#course");
+            });
+            return this;
         });
-        return this;
+        console.log("should happen before")
+        resolve("courses filled")
     });
 }
 
 function fillInstructors($) {
-    // Fetch instructor data from API, based on selected course
-    var course = $("#course").val();
-    var pageSize = "1000";
-    var instrEndpoint = `/api/instructors/?course=${course}` +
-        `&page_size=${pageSize}`;
-    $.getJSON(instrEndpoint, function (data) {
-        clearDropdown("#instructor"); // Empty dropdown
+    return new Promise(resolve => {
+        // Fetch instructor data from API, based on selected course
+        var course = $("#course").val();
+        var pageSize = "1000";
+        var instrEndpoint = `/api/instructors/?course=${course}` +
+            `&page_size=${pageSize}`;
+        $.getJSON(instrEndpoint, function (data) {
+            clearDropdown("#instructor"); // Empty dropdown
 
-        // Generate option tags
-        $.each(data.results, function (i, instr) {
-            $("<option />", {
-                val: instr.id,
-                text: instr.first_name + " " + instr.last_name
-            }).appendTo("#instructor");
+            // Generate option tags
+            $.each(data.results, function (i, instr) {
+                $("<option />", {
+                    val: instr.id,
+                    text: instr.first_name + " " + instr.last_name
+                }).appendTo("#instructor");
+            });
+            return this;
         });
-        return this;
+        resolve("instructors filled")
     });
 }
 
 function fillSemesters($) {
-    // Fetch all semester data from API
-    var course = $("#course").val();
-    var instrID = $("#instructor").val();
-    var semEndpoint = `/api/semesters/?course=${course}&instructor=${instrID}`;
-    $.getJSON(semEndpoint, function (data) {
-        // Generate option tags
-        $.each(data, function (i, semester) {
-            // Note: API returns semester list in reverse chronological order,
-            // Most recent 5 years only
-            $("<option />", {
-                val: semester.id,
-                text: semester.season + " " + semester.year
-            }).appendTo("#semester");
+    return new Promise(resolve => {
+        // Fetch all semester data from API
+        var course = $("#course").val();
+        var instrID = $("#instructor").val();
+        var semEndpoint = `/api/semesters/?course=${course}&instructor=${instrID}`;
+        $.getJSON(semEndpoint, function (data) {
+            // Generate option tags
+            $.each(data, function (i, semester) {
+                // Note: API returns semester list in reverse chronological order,
+                // Most recent 5 years only
+                $("<option />", {
+                    val: semester.id,
+                    text: semester.season + " " + semester.year
+                }).appendTo("#semester");
+            });
+            return this;
         });
-        return this;
+        resolve("semesters filled")
     });
 }

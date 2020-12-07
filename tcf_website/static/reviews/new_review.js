@@ -11,6 +11,11 @@ jQuery(function($) {
     clearDropdown("#course");
     clearDropdown("#instructor");
     clearDropdown("#semester");
+    // Enable subject selector, disable the following
+    $("#subject").prop("disabled", false);
+    $("#course").prop("disabled", true);
+    $("#instructor").prop("disabled", true);
+    $("#semester").prop("disabled", true);
 
     // Fetch all subdepartment data from API
     var subdeptEndpoint = "/api/subdepartments/";
@@ -30,19 +35,16 @@ jQuery(function($) {
         return this;
     });
 
-    // Enable subject selector, disable the following
-    $("#subject").prop("disabled", false);
-    $("#course").prop("disabled", true);
-    $("#instructor").prop("disabled", true);
-    $("#semester").prop("disabled", true);
-
-
     // Fetch course data on subject select
     $("#subject").change(function() {
         // Clear & disable sequenced dropdowns
         clearDropdown("#course");
         clearDropdown("#instructor");
         clearDropdown("#semester");
+        // Enable course selector, disable the following
+        $("#course").prop("disabled", false);
+        $("#instructor").prop("disabled", true);
+        $("#semester").prop("disabled", true);
 
         // Fetch course data from API, based on selected subdepartment
         var subdeptID = $("#subject").val();
@@ -59,11 +61,6 @@ jQuery(function($) {
             });
             return this;
         });
-
-        // Enable course selector, disable the following
-        $("#course").prop("disabled", false);
-        $("#instructor").prop("disabled", true);
-        $("#semester").prop("disabled", true);
     });
 
     // Fetch instructor data on course select
@@ -71,6 +68,9 @@ jQuery(function($) {
         // Clear & disable sequenced dropdowns
         clearDropdown("#instructor");
         clearDropdown("#semester");
+        // Enable instructor selector, disable the following
+        $("#instructor").prop("disabled", false);
+        $("#semester").prop("disabled", true);
 
         // Fetch instructor data from API, based on selected course
         var course = $("#course").val();
@@ -89,16 +89,14 @@ jQuery(function($) {
             });
             return this;
         });
-
-        // Enable instructor selector, disable the following
-        $("#instructor").prop("disabled", false);
-        $("#semester").prop("disabled", true);
     });
 
     // Fetch semester data on instructor select
     $("#instructor").change(function() {
         // Clear & disable sequenced dropdowns
         clearDropdown("#semester");
+        // Enable semester selector, disable the following
+        $("#semester").prop("disabled", false);
 
         // Fetch all semester data from API
         var course = $("#course").val();
@@ -116,9 +114,6 @@ jQuery(function($) {
             });
             return this;
         });
-
-        // Enable semester selector, disable the following
-        $("#semester").prop("disabled", false);
     });
 
     /* Course Rating Slider Inputs */

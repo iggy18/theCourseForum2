@@ -1,0 +1,24 @@
+{% extends "base/base.html" %}
+{% load static %}
+
+{% block title %}Page not found{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
+<section class="container-fluid">
+    <div class="row">
+        <div class="card col-12 col-sm-9 col-md-9 col-xl-6 mt-3 py-5">
+            <div class="card-body d-flex flex-column align-items-center">
+                <h1 class="display-1">404</h1>
+                <p>Sorry! We couldn't find that page.</p>
+                <a href="#bugModal" data-toggle="modal" data-target="#bugModal" id="bugFormOpen">
+                    Report a bug
+                </a>
+              </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

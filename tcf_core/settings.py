@@ -30,7 +30,7 @@ SECRET_KEY = env.str('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = int(env.str('DEBUG', 0)) == 1      # Why can't debug be a bool?
-DEBUG = env.str('DEBUG', default=False)
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '.ngrok.io', '127.0.0.1']
 
@@ -179,47 +179,6 @@ SOCIAL_AUTH_PIPELINE = (
 ES_PUBLIC_API_KEY = env.str('ES_PUBLIC_API_KEY')
 ES_COURSE_SEARCH_ENDPOINT = env.str('ES_COURSE_SEARCH_ENDPOINT')
 ES_INSTRUCTOR_SEARCH_ENDPOINT = env.str('ES_INSTRUCTOR_SEARCH_ENDPOINT')
-
-# PROD SETTINGS
-if not DEBUG:
-
-    # Heroku configuration.
-    if env.bool("HEROKU", default=False):
-        import django_heroku
-        django_heroku.settings(locals())
-
-    # Gather information from environment variables.
-
-    # HOSTNAME = env.str('HOSTNAME')
-    # PUBLIC_IPV4 = env.str('PUBLIC_IPV4')
-
-    # SECURITY WARNING: App Engine's security features ensure that it is safe to
-    # have ALLOWED_HOSTS = ['*'] when the app is deployed. If you deploy a Django
-    # app not on App Engine, make sure to set an appropriate host here.
-    # See https://docs.djangoproject.com/en/1.10/ref/settings/ (from GCP
-    # documentation)
-    ALLOWED_HOSTS = ['*', 'thecourseforum.com']
-
-    # if HOSTNAME:
-    #     ALLOWED_HOSTS.append(HOSTNAME)
-    # if PUBLIC_IPV4:
-    #     ALLOWED_HOSTS.append(PUBLIC_IPV4)
-
-    # Read-write access to Elastic
-    ES_COURSE_DOCUMENTS_ENDPOINT = env.str('ES_COURSE_DOCUMENTS_ENDPOINT')
-    ES_INSTRUCTOR_DOCUMENTS_ENDPOINT = env.str(
-        'ES_INSTRUCTOR_DOCUMENTS_ENDPOINT')
-    ES_PRIVATE_API_KEY = env.str('ES_PRIVATE_API_KEY')
-
-    DATABASES['default'] = {
-        'NAME': env.str('DB_NAME'),
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'USER': env.str('DB_USER'),
-        'PASSWORD': env.str('DB_PASSWORD'),
-        'HOST': env.str('DB_HOST'),
-        'PORT': env.str('DB_PORT'),
-        'OPTIONS': {'sslmode': 'require'},
-    }
 
 LOGGING = {
     'version': 1,

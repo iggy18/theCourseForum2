@@ -52,6 +52,13 @@ class Command(BaseCommand):
             for obj in Instructor.objects.values('id', 'first_name',
                                                  'last_name', 'email')
         }
+        # used for gpa calculation
+        self.grade_weights = [4.0, 4.0, 3.7,
+                              3.3, 3.0, 2.7,
+                              2.3, 2.0, 1.7,
+                              1.3, 1.0, 0.7,
+                              0,
+                              0, 0, 0]
         semester = options['semester']
         if semester == 'ALL_DANGEROUS':
             # Truncate existing tables
@@ -160,22 +167,19 @@ class Command(BaseCommand):
             course_instructor_grades[course_instructor_identifier] = this_semesters_grades
 
     def load_dict_into_models(self):
+        self.load_course_grade_dict_to_db()
+        self.load_course_instructor_grade_dict_to_db()
+
+    def load_course_grade_dict_to_db(self):
         if self.verbosity > 0:
             print('Step 2: Bulk-create CourseGrade instances')
-        # used for gpa calculation
-        grade_weights = [4.0, 4.0, 3.7,
-                         3.3, 3.0, 2.7,
-                         2.3, 2.0, 1.7,
-                         1.3, 1.0, 0.7,
-                         0,
-                         0, 0, 0]
 
         # load course grades
         unsaved_cg_instances = []
         for row in tqdm(course_grades):
             total_enrolled = sum(course_grades[row])
             total_weight = sum(a * b for a, b in
-                               zip(course_grades[row], grade_weights))
+                               zip(course_grades[row], self.grade_weights))
 
             # calculate gpa excluding ot/drop/withdraw in total_enrolled
             total_enrolled_filtered = total_enrolled - \
@@ -216,6 +220,7 @@ class Command(BaseCommand):
         if self.verbosity > 0:
             print('Done creating CourseGrade instances')
 
+    def load_course_instructor_grade_dict_to_db(self):
         if self.verbosity > 0:
             print('Step 3: Bulk-create CourseInstructorGrade instances')
         # load course instructor grades
@@ -228,7 +233,7 @@ class Command(BaseCommand):
             total_weight = 0
             for i in range(len(course_instructor_grades[row])):
                 total_weight += (
-                    course_instructor_grades[row][i] * grade_weights[i])
+                    course_instructor_grades[row][i] * self.grade_weights[i])
 
             # calculate gpa without including ot/drop/withdraw in
             # total_enrolled

@@ -54,6 +54,9 @@ class Command(BaseCommand):
         }
         semester = options['semester']
         if semester == 'ALL_DANGEROUS':
+            # Truncate existing tables
+            CourseGrade.objects.all().delete()
+            CourseInstructorGrade.objects.all().delete()
             # ignores temporary files ('~' on Windows, '.' otherwise)
             for file in sorted(os.listdir(self.data_dir)):
                 if file[0] not in ('.', '~'):
@@ -63,10 +66,6 @@ class Command(BaseCommand):
         self.load_dict_into_models()
 
     def clean(self, df):
-        # Truncate existing tables
-        CourseGrade.objects.all().delete()
-        CourseInstructorGrade.objects.all().delete()
-
         # Filter out data with no grades
         df = df.dropna(
             how="all",

@@ -20,10 +20,6 @@ class Command(BaseCommand):
     """
     help = 'Imports grade data from VAGrades CSV files into PostgresSQL database'
 
-    # Not a good practice but declared as global for readability & convenience?
-    global course_grades
-    global course_instructor_grades
-
     course_grades = {}
     course_instructor_grades = {}
 
@@ -164,19 +160,19 @@ class Command(BaseCommand):
                                  ot, drop, withdraw]
 
         # load this semester into course dictionary
-        if course_identifier in course_grades:
-            for i in range(len(course_grades[course_identifier])):
-                course_grades[course_identifier][i] += this_semesters_grades[i]
+        if course_identifier in self.course_grades:
+            for i in range(len(self.course_grades[course_identifier])):
+                self.course_grades[course_identifier][i] += this_semesters_grades[i]
         else:
-            course_grades[course_identifier] = this_semesters_grades
+            self.course_grades[course_identifier] = this_semesters_grades
 
         # load this semester into course instructor dictionary
-        if course_instructor_identifier in course_instructor_grades:
+        if course_instructor_identifier in self.course_instructor_grades:
             for i in range(
-                    len(course_instructor_grades[course_instructor_identifier])):
-                course_instructor_grades[course_instructor_identifier][i] += this_semesters_grades[i]
+                    len(self.course_instructor_grades[course_instructor_identifier])):
+                self.course_instructor_grades[course_instructor_identifier][i] += this_semesters_grades[i]
         else:
-            course_instructor_grades[course_instructor_identifier] = this_semesters_grades
+            self.course_instructor_grades[course_instructor_identifier] = this_semesters_grades
 
     def load_dict_into_models(self):
         self.load_course_grade_dict_to_db()
@@ -188,14 +184,14 @@ class Command(BaseCommand):
 
         # load course grades
         unsaved_cg_instances = []
-        for row in tqdm(course_grades):
-            total_enrolled = sum(course_grades[row])
+        for row in tqdm(self.course_grades):
+            total_enrolled = sum(self.course_grades[row])
             total_weight = sum(a * b for a, b in
-                               zip(course_grades[row], self.grade_weights))
+                               zip(self.course_grades[row], self.grade_weights))
 
             # calculate gpa excluding ot/drop/withdraw in total_enrolled
             total_enrolled_filtered = total_enrolled - \
-                sum(course_grades[row][i] for i in (13, 14, 15))
+                sum(self.course_grades[row][i] for i in (13, 14, 15))
             # check divide by 0
             if total_enrolled_filtered == 0:
                 total_enrolled_gpa = 0
@@ -208,22 +204,22 @@ class Command(BaseCommand):
                 'number': row[1],
                 'title': row[2],
                 'average': total_enrolled_gpa,
-                'a_plus': course_grades[row][0],
-                'a': course_grades[row][1],
-                'a_minus': course_grades[row][2],
-                'b_plus': course_grades[row][3],
-                'b': course_grades[row][4],
-                'b_minus': course_grades[row][5],
-                'c_plus': course_grades[row][6],
-                'c': course_grades[row][7],
-                'c_minus': course_grades[row][8],
-                'd_plus': course_grades[row][9],
-                'd': course_grades[row][10],
-                'd_minus': course_grades[row][11],
-                'f': course_grades[row][12],
-                'ot': course_grades[row][13],
-                'drop': course_grades[row][14],
-                'withdraw': course_grades[row][15],
+                'a_plus': self.course_grades[row][0],
+                'a': self.course_grades[row][1],
+                'a_minus': self.course_grades[row][2],
+                'b_plus': self.course_grades[row][3],
+                'b': self.course_grades[row][4],
+                'b_minus': self.course_grades[row][5],
+                'c_plus': self.course_grades[row][6],
+                'c': self.course_grades[row][7],
+                'c_minus': self.course_grades[row][8],
+                'd_plus': self.course_grades[row][9],
+                'd': self.course_grades[row][10],
+                'd_minus': self.course_grades[row][11],
+                'f': self.course_grades[row][12],
+                'ot': self.course_grades[row][13],
+                'drop': self.course_grades[row][14],
+                'withdraw': self.course_grades[row][15],
                 'total_enrolled': total_enrolled
             }
             unsaved_cg_instance = CourseGrade(**course_grade_params)
@@ -237,20 +233,20 @@ class Command(BaseCommand):
             print('Step 3: Bulk-create CourseInstructorGrade instances')
         # load course instructor grades
         unsaved_cig_instances = []
-        for row in tqdm(course_instructor_grades):
+        for row in tqdm(self.course_instructor_grades):
             total_enrolled = 0
-            for grade_count in course_instructor_grades[row]:
+            for grade_count in self.course_instructor_grades[row]:
                 total_enrolled += grade_count
 
             total_weight = 0
-            for i in range(len(course_instructor_grades[row])):
+            for i in range(len(self.course_instructor_grades[row])):
                 total_weight += (
-                    course_instructor_grades[row][i] * self.grade_weights[i])
+                    self.course_instructor_grades[row][i] * self.grade_weights[i])
 
             # calculate gpa without including ot/drop/withdraw in
             # total_enrolled
             total_enrolled_filtered = total_enrolled - \
-                sum(course_instructor_grades[row][i] for i in (13, 14, 15))
+                sum(self.course_instructor_grades[row][i] for i in (13, 14, 15))
             if total_enrolled_filtered == 0:
                 total_enrolled_gpa = 0
             else:
@@ -266,22 +262,22 @@ class Command(BaseCommand):
                 'course_id': self.courses.get(row[:2]),
                 'instructor_id': self.instructors.get(row[2:]),
                 'average': total_enrolled_gpa,
-                'a_plus': course_instructor_grades[row][0],
-                'a': course_instructor_grades[row][1],
-                'a_minus': course_instructor_grades[row][2],
-                'b_plus': course_instructor_grades[row][3],
-                'b': course_instructor_grades[row][4],
-                'b_minus': course_instructor_grades[row][5],
-                'c_plus': course_instructor_grades[row][6],
-                'c': course_instructor_grades[row][7],
-                'c_minus': course_instructor_grades[row][8],
-                'd_plus': course_instructor_grades[row][9],
-                'd': course_instructor_grades[row][10],
-                'd_minus': course_instructor_grades[row][11],
-                'f': course_instructor_grades[row][12],
-                'ot': course_instructor_grades[row][13],
-                'drop': course_instructor_grades[row][14],
-                'withdraw': course_instructor_grades[row][15],
+                'a_plus': self.course_instructor_grades[row][0],
+                'a': self.course_instructor_grades[row][1],
+                'a_minus': self.course_instructor_grades[row][2],
+                'b_plus': self.course_instructor_grades[row][3],
+                'b': self.course_instructor_grades[row][4],
+                'b_minus': self.course_instructor_grades[row][5],
+                'c_plus': self.course_instructor_grades[row][6],
+                'c': self.course_instructor_grades[row][7],
+                'c_minus': self.course_instructor_grades[row][8],
+                'd_plus': self.course_instructor_grades[row][9],
+                'd': self.course_instructor_grades[row][10],
+                'd_minus': self.course_instructor_grades[row][11],
+                'f': self.course_instructor_grades[row][12],
+                'ot': self.course_instructor_grades[row][13],
+                'drop': self.course_instructor_grades[row][14],
+                'withdraw': self.course_instructor_grades[row][15],
                 'total_enrolled': total_enrolled
             }
             unsaved_cig_instance = CourseInstructorGrade(

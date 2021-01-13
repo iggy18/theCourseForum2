@@ -1,12 +1,15 @@
+from functools import reduce
+from operator import or_
 import os
-import pandas as pd
 import re
 
-from django.core.management.base import BaseCommand
-from tcf_website.models import *
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.core.management.base import BaseCommand
+from django.db.models import Case, Count, F, FloatField, Q, Sum, Value, When
+import pandas as pd
 from tqdm import tqdm
+
+from tcf_website.models import Course, CourseGrade, CourseInstructorGrade, Instructor
 
 
 class Command(BaseCommand):
@@ -53,6 +56,13 @@ class Command(BaseCommand):
                                                  'last_name', 'email')
         }
         # used for gpa calculation
+        self.grades = [
+            'a_plus', 'a', 'a_minus',
+            'b_plus', 'b', 'b_minus',
+            'c_plus', 'c', 'c_minus',
+            'd_plus', 'd', 'd_minus',
+            'f', 'ot', 'drop', 'withdraw',
+        ]
         self.grade_weights = [4.0, 4.0, 3.7,
                               3.3, 3.0, 2.7,
                               2.3, 2.0, 1.7,
@@ -68,9 +78,11 @@ class Command(BaseCommand):
             for file in sorted(os.listdir(self.data_dir)):
                 if file[0] not in ('.', '~'):
                     self.load_semester_file(file)
+            self.load_dict_into_models()
         else:
             self.load_semester_file(f"{semester.lower()}.csv")
-        self.load_dict_into_models()
+            self.load_dict_into_models()
+            self.consolidate_duplicate_instances()
 
     def clean(self, df):
         # Filter out data with no grades
@@ -278,3 +290,111 @@ class Command(BaseCommand):
         CourseInstructorGrade.objects.bulk_create(unsaved_cig_instances)
         if self.verbosity > 0:
             print('Done creating CourseInstructorGrade instances')
+
+    def consolidate_duplicate_instances(self):
+        self.consolidate_course_grade_instances()
+        self.consolidate_course_instructor_grade_instances()
+
+    def consolidate_course_grade_instances(self):
+        fields_to_group_by = [
+            'course_id', 'subdepartment', 'number', 'title',
+        ]
+        fields_to_sum = self.grades + ['total_enrolled']
+        fields_to_compute = ['average']
+        fields_all = fields_to_group_by + fields_to_sum + fields_to_compute
+
+        combined = list(
+            CourseGrade.objects
+            .values(*fields_to_group_by)  # This is what combines each pair
+            .annotate(
+                **{field: Sum(field) for field in fields_to_sum},
+                actual_enrolled=(F('total_enrolled') -
+                                 F('ot') - F('drop') - F('withdraw')),
+                average=Case(
+                    When(
+                        actual_enrolled__gt=0,
+                        then=sum(
+                            F(grade_name) * grade_weight
+                            for grade_name, grade_weight
+                            in zip(self.grades, self.grade_weights)
+                        ) / F('actual_enrolled')
+                    ),
+                    default=Value('0'),
+                    output_field=FloatField()
+                )
+            ).values(*fields_all)  # to exclude actual_enrolled
+        )
+        # Drop all CourseGrade instances
+        num_deleted, _ = CourseGrade.objects.all().delete()
+        if self.verbosity > 0:
+            print(f'{num_deleted} instances deleted')
+        # Create combined instances
+        objects_created = CourseGrade.objects.bulk_create(
+            [CourseGrade(**x) for x in combined])
+        if self.verbosity > 0:
+            print(f'{len(objects_created)} instances created')
+
+        # Check the number of `MultipleObjectsReturned` errors
+        assert CourseGrade.objects\
+            .exclude(course=None)\
+            .values('course', 'title')\
+            .annotate(num=Count('id'))\
+            .filter(num__gt=1).count() == 0, \
+            'Multiple `CourseGrade`s for (course, title) pair?'
+
+    def consolidate_course_instructor_grade_instances(self):
+        fields_to_group_by = [
+            'subdepartment', 'number', 'first_name', 'middle_name',
+            'last_name', 'email', 'course_id', 'instructor_id',
+        ]
+        fields_to_sum = self.grades + ['total_enrolled']
+        fields_to_compute = ['average']
+        fields_all = fields_to_group_by + fields_to_sum + fields_to_compute
+
+        combined = list(
+            CourseInstructorGrade.objects
+            .values(*fields_to_group_by)  # This is what combines each pair
+            .annotate(
+                **{field: Sum(field) for field in fields_to_sum},
+                actual_enrolled=(F('total_enrolled') -
+                                 F('ot') - F('drop') - F('withdraw')),
+                average=Case(
+                    When(
+                        actual_enrolled__gt=0,
+                        then=sum(
+                            F(grade_name) * grade_weight
+                            for grade_name, grade_weight
+                            in zip(self.grades, self.grade_weights)
+                        ) / F('actual_enrolled')
+                    ),
+                    default=Value('0'),
+                    output_field=FloatField()
+                )
+            ).values(*fields_all)  # to exclude actual_enrolled
+        )
+        # Drop all CourseInstructorGrade instances
+        num_deleted, _ = CourseInstructorGrade.objects.all().delete()
+        if self.verbosity > 0:
+            print(f'{num_deleted} instances deleted')
+        # Create combined instances
+        objects_created = CourseInstructorGrade.objects.bulk_create(
+            [CourseInstructorGrade(**x) for x in combined])
+        if self.verbosity > 0:
+            print(f'{len(objects_created)} instances created')
+
+        # Check the number of `MultipleObjectsReturned` errors
+        assert CourseInstructorGrade.objects\
+            .exclude(course=None)\
+            .exclude(instructor=None)\
+            .values('course', 'instructor')\
+            .annotate(num=Count('id'))\
+            .filter(num__gt=1).count() == 0, \
+            'Multiple `CourseInstructorGrade`s for (course, instructor) pair?'
+
+        assert CourseInstructorGrade.objects\
+            .exclude(course=None)\
+            .exclude(instructor=None)\
+            .values('course', 'first_name', 'last_name')\
+            .annotate(num=Count('id'))\
+            .filter(num__gt=1).count() == 0, \
+            'Multiple `CourseInstructorGrade`s for professors with same name'

@@ -323,12 +323,12 @@ class Command(BaseCommand):
         # Drop all CourseGrade instances
         num_deleted, _ = CourseGrade.objects.all().delete()
         if self.verbosity > 0:
-            print(f'{num_deleted} instances deleted')
+            print(f'{num_deleted} CourseGrade instances deleted')
         # Create combined instances
         objects_created = CourseGrade.objects.bulk_create(
             [CourseGrade(**x) for x in combined])
         if self.verbosity > 0:
-            print(f'{len(objects_created)} instances created')
+            print(f'{len(objects_created)} CourseGrade instances created')
 
         # Check the number of `MultipleObjectsReturned` errors
         assert CourseGrade.objects\
@@ -371,12 +371,12 @@ class Command(BaseCommand):
         # Drop all CourseInstructorGrade instances
         num_deleted, _ = CourseInstructorGrade.objects.all().delete()
         if self.verbosity > 0:
-            print(f'{num_deleted} instances deleted')
+            print(f'{num_deleted} CourseInstructorGrade instances deleted')
         # Create combined instances
         objects_created = CourseInstructorGrade.objects.bulk_create(
             [CourseInstructorGrade(**x) for x in combined])
         if self.verbosity > 0:
-            print(f'{len(objects_created)} instances created')
+            print(f'{len(objects_created)} CourseInstructorGrade instances created')
 
         # Check the number of `MultipleObjectsReturned` errors
         assert CourseInstructorGrade.objects\

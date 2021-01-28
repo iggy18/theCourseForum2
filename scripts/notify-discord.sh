@@ -36,23 +36,23 @@ function get_emoji {
   esac
 }
 run_link="$repo_link/actions/runs/$GITHUB_RUN_ID"
-pylint_formatted="$(get_emoji $PYLINT_RESULT) **Pylint**"
-django_formatted="$(get_emoji $DJANGO_RESULT) **Django** (code coverage: ${DJANGO_COVERAGE:-unknown})"
-eslint_formatted="$(get_emoji $ESLINT_RESULT) **ESLint**"
+pylint_formatted="$(get_emoji "$PYLINT_RESULT") **Pylint**"
+django_formatted="$(get_emoji "$DJANGO_RESULT") **Django** (code coverage: ${DJANGO_COVERAGE:-unknown})"
+eslint_formatted="$(get_emoji "$ESLINT_RESULT") **ESLint**"
 body=$(cat  << EOF
 {
   "content": "$(get_content). See more about the result [here]($run_link).",
   "embeds": [
     {
       "description": "$pylint_formatted\\n$django_formatted\\n$eslint_formatted",
-      "color": $(get_color $PYLINT_RESULT $DJANGO_RESULT $ESLINT_RESULT)
+      "color": $(get_color "$PYLINT_RESULT" "$DJANGO_RESULT" "$ESLINT_RESULT")
     }
   ]
 }
 EOF
 )
 
-curl $DISCORD_WEBHOOK \
+curl "$DISCORD_WEBHOOK" \
   -X POST \
   -H "Content-Type: application/json" \
   -d "$body"

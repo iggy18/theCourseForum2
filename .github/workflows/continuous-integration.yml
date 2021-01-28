@@ -1,4 +1,5 @@
 # Based on https://github.com/actions/starter-workflows/blob/main/ci/django.yml
+---
 name: Continuous Integration
 
 on:
@@ -6,12 +7,12 @@ on:
     branches:
       - '*'
     paths-ignore:
-    - 'docs/**'
+      - 'docs/**'
   # The following is needed to run tests upon direct push to master
   push:
-    branches: [master]
+    branches: [master, super-linter]
     paths-ignore:
-    - 'docs/**'
+      - 'docs/**'
 env:
   PYTHON_TARGET: 3.8
   # Django
@@ -87,44 +88,23 @@ jobs:
         run: |
           echo "::set-output name=percentage::$(coverage report | grep -o '[0-9]\+%' | tail -1)"
 
-      - name: Run pylint
+      - name: Lint Code Base
         if: ${{ always() }}
-        id: pylint
-        run: |
-          pylint --django-settings-module=${{ env.DJANGO_SETTINGS_MODULE }} \
-            --load-plugins pylint_django tcf_website tcf_core
-  eslint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Install Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-
-      - name: Install npm packages
-        run: npm ci
-
-      - name: Run ESLint
-        run: node_modules/.bin/eslint tcf_website/static/**/*.js -c .config/.eslintrc.yml
-
-  discord:
-    if: ${{ always() }}
-    needs: [django, eslint]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Send a message to tCF Discord Server when all jobs are finished
+        uses: github/super-linter@v3
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_URL_CI }}
-          PYLINT_RESULT: ${{ needs.django.outputs.pylint-result }}
-          DJANGO_RESULT: ${{ needs.django.outputs.django-result }}
-          ESLINT_RESULT: ${{ needs.eslint.result }}
-          PR_NUMBER: ${{ github.event.number}}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          DJANGO_COVERAGE: ${{ needs.django.outputs.code-coverage }}
-        run: |
-          chmod +x ./scripts/notify-discord.sh
-          ./scripts/notify-discord.sh
-        shell: bash
+          DEFAULT_BRANCH: dev
+          DJANGO_SETTINGS_MODULE: ${{ env.DJANGO_SETTINGS_MODULE }}  # Needed for Pylint
+          LINTER_RULES_PATH: .config  # TODO: Consider changing to .github/linters when done
+          PYTHON_PYLINT_CONFIG_FILE: .pylintrc 
+          VALIDATE_CSS: false  # TODO: Too many to fix atm
+          VALIDATE_ENV: false  # We don't want alphabetical sorting
+          VALIDATE_HTML: false  # Doesn't work with the Django Template Language
+          VALIDATE_JAVASCRIPT_ES: false  # TODO: ignorePatterns doesn't work
+          VALIDATE_JAVASCRIPT_STANDARD: false  # We use ESLint instead
+          VALIDATE_JSCPD: false  # We use ESLint instead
+          VALIDATE_MARKDOWN: false  # Very pedantic
+          VALIDATE_PYTHON_BLACK: false  # We use Pylint instead
+          VALIDATE_PYTHON_FLAKE8: false  # We use Pylint instead
+          VALIDATE_PYTHON_ISORT: false  # We use Pylint instead
+          VALIDATE_PYTHON_PYLINT: false  # TODO: Get load_plugins working
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
